@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c7620dddbd11549b11000d4b44295342
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 6
+  packageName: Terrain Assets
+  packageVersion: 1.04
+  assetPath: Assets/Terrain Assets/Trees Ambient-Occlusion/Materials/sycamore4normal.mat
+  uploadId: 24378
