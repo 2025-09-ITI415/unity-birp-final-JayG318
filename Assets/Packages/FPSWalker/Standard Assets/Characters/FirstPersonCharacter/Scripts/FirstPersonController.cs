@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
+using System.Collections;
 
 #pragma warning disable 618, 649
 namespace UnityStandardAssets.Characters.FirstPerson
@@ -42,6 +44,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+        private int count;
+        public Text countText;
+	    public Text winText;
 
         // Use this for initialization
         private void Start()
@@ -56,6 +61,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            count = 0;
+            SetCountText ();
+            winText.text = "";
         }
 
 
@@ -258,6 +266,31 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+        }
+
+        void OnTriggerEnter(Collider other) 
+        {
+            if (other.gameObject.CompareTag ("Pick Up"))
+            {
+                other.gameObject.SetActive (false);
+
+                count = count + 1;
+
+                SetCountText ();
+            }
+        }
+
+        void SetCountText()
+        {
+            countText.text = "Count: " + count.ToString ();
+
+            if (count >= 12) 
+            {
+                winText.text = "You Win!";
+            }
+            else if (count == 0) {
+                winText.text = "You Fell! Try Again!";
+            }
         }
     }
 }
