@@ -5,6 +5,7 @@ using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable 618, 649
 namespace UnityStandardAssets.Characters.FirstPerson
@@ -45,8 +46,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
         private int count;
+        private int count2;
         public Text countText;
+        public Text countText2;
 	    public Text winText;
+        public Image fadeImage;
+        public float fadeDuration = 1f;
+        public float waitAfterFade = 5f;
+        private bool fadeStarted = false;
+        private bool fadeComplete = false;
+        private float fadeTimer = 0f;
+        private float waitTimer = 0f;
 
         // Use this for initialization
         private void Start()
@@ -62,6 +72,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
             count = 0;
+            count2 = 0;
             SetCountText ();
             winText.text = "";
         }
@@ -90,6 +101,37 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
+
+            if (count >= 5 && count2 >= 5 && !fadeStarted)
+            {
+                StartFade();
+                winText.text = "To Be Continued...";
+            }
+
+            if (fadeStarted)
+            {
+                if (!fadeComplete)
+                {
+                    fadeTimer += Time.deltaTime;
+                    Color c = fadeImage.color;
+                    c.a = Mathf.Clamp01(fadeTimer / fadeDuration);
+                    fadeImage.color = c;
+
+                    if (c.a >= 1f)
+                    {
+                        fadeComplete = true;
+                        waitTimer = 0f;
+                    }
+                }
+                else
+                {
+                    waitTimer += Time.deltaTime;
+                    if (waitTimer >= waitAfterFade)
+                    {
+                        Restart();
+                    }
+                }
+            }
         }
 
 
@@ -278,19 +320,50 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 SetCountText ();
             }
+
+            if (other.gameObject.CompareTag ("Pick Up2"))
+            {
+                other.gameObject.SetActive (false);
+
+                count2 = count2 + 1;
+
+                SetCountText ();
+            }
         }
 
         void SetCountText()
         {
-            countText.text = "Count: " + count.ToString ();
+            countText.text = "Ruby: " + count.ToString () + "/5";
+            countText2.text = "Sapphire: " + count2.ToString () + "/5";
 
-            if (count >= 12) 
+            if (count >= 5)
             {
-                winText.text = "You Win!";
+                countText.color = Color.green;
             }
-            else if (count == 0) {
-                winText.text = "You Fell! Try Again!";
+
+            if (count2 >= 5)
+            {
+                countText2.color = Color.green;
             }
+        }
+
+        public void StartFade()
+        {
+            fadeStarted = true;
+            fadeImage.gameObject.SetActive(true);
+            fadeTimer = 0f;
+            waitTimer = 0f;
+
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
+        }
+
+        void Restart()
+        {
+            // Reload __Scene_0 to restart the game
+            // "__Scene_0" below starts with 2 underscores and ends with a zero.
+            SceneManager.LoadScene("SampleScene");                               // d
         }
     }
 }
